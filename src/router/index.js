@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import recommend from 'components/recommend/recommend'
-import rank from 'components/rank/rank'
-import singer from 'components/singer/singer'
-import search from 'components/search/search'
+const recommend = resolve => require(['components/recommend/recommend'],resolve);
+const rank = resolve => require(['components/rank/rank'],resolve);
+const singer = resolve => require(['components/singer/singer'],resolve);
+const search = resolve => require(['components/search/search'],resolve);
 
 Vue.use(Router)
 
