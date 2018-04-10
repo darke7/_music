@@ -86,7 +86,7 @@ export default {
       text-align:center
       height:150px
       img
-        height:200px
+        height:150px
       .swiper-pagination-bullet-active
         width:20px
         border-radius:20px
