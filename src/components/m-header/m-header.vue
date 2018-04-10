@@ -22,6 +22,8 @@
     text-align: center
     color: $color-theme
     font-size: 0
+    z-index: 2
+    background:$color-background
     .icon
       display: inline-block
       vertical-align: top

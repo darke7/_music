@@ -1,31 +1,73 @@
 <template>
   <div class="recommend">
-      <div class="recommend-content">
-        <div v-if="recommends.length" class="slider-wrapper" ref="sliderWrapper">
-            <slider swipeid="swipe" :autoplay="2500">
-              <div v-for="top in recommends" :key="top.id" class="swiper-slide" slot="swiper-con" >
-                <img :src="top.picUrl">
-              <!-- <h3>{{top.title}}</h3> -->
-              </div>
-            </slider>
+      <scroll class="recommend-content" :data="discList">
+        <div>
+          <div v-if="recommends.length" class="slider-wrapper" ref="sliderWrapper">
+              <slider swipeid="swipe" :autoplay="2500">
+                <div v-for="top in recommends" :key="top.id" class="swiper-slide" slot="swiper-con" >
+                  <img :src="top.picUrl">
+                <!-- <h3>{{top.title}}</h3> -->
+                </div>
+              </slider>
+          </div>
+          <div class="recommend-list">
+            <h1 class="list-title">热门歌单推荐</h1>
+            <ul>
+              <li @click="" v-for="item in discList" class="item">
+                <div class="icon">
+                  <img width="60" height="60" v-lazy="item.imgurl">
+                </div>
+                <div class="text">
+                  <h2 class="name" v-html="item.creator.name"></h2>
+                  <p class="desc" v-html="item.dissname"></p>
+                </div>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div class="recommend-list">
-          <h1 class="list-title">热门歌单推荐</h1>
-          <ul>
-            <li @click="" v-for="item in discList" class="item">
-              <div class="icon">
-                <img width="60" height="60" v-lazy="item.imgurl">
-              </div>
-              <div class="text">
-                <h2 class="name" v-html="item.creator.name"></h2>
-                <p class="desc" v-html="item.dissname"></p>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
+      </scroll>
   </div>
 </template>
+<script>
+import {ERR_OK} from 'api/config'
+import {getRecommend,getDiscList} from 'api/recommend'
+import slider from 'base/slider/slider'
+import scroll from 'base/scroll/scroll'
+export default {
+  data () {
+    return {
+    	recommends: [],
+      discList:[]
+    }
+  },
+  mounted(){
+  	this._getRecommend();
+    this._getDiscList();
+  },
+  methods:{
+  	_getRecommend(){
+  		getRecommend().then((res) => {
+  			if (res.code === ERR_OK) {
+  				this.recommends = res.data.slider;
+  			}
+      })
+  	},
+    _getDiscList(){
+      getDiscList().then((res)=>{
+        if(res.code === ERR_OK){
+          this.discList = res.data.list;
+        }
+      })
+    }
+  },
+  components:{
+    slider,
+    scroll
+  }
+
+}
+</script>
+
 <style lang="stylus">
 .recommend
   position: fixed
@@ -34,7 +76,6 @@
   bottom: 0
   .recommend-content
     height: 100%
-    overflow: auto
     .slider-wrapper
       position: relative
       width: 100%
@@ -82,42 +123,3 @@
       top: 50%
       transform: translateY(-50%)
 </style>
-<script>
-import {ERR_OK} from 'api/config'
-import {getRecommend,getDiscList} from 'api/recommend'
-import slider from 'base/slider/slider'
-export default {
-  data () {
-    return {
-    	recommends: [],
-      discList:[]
-    }
-  },
-  mounted(){
-  	this._getRecommend();
-    this._getDiscList();
-  },
-  methods:{
-  	_getRecommend(){
-  		getRecommend().then((res) => {
-  			if (res.code === ERR_OK) {
-  				this.recommends = res.data.slider;
-  			}
-      })
-  	},
-    _getDiscList(){
-      getDiscList().then((res)=>{
-        if(res.code === ERR_OK){
-          this.discList = res.data.list;
-          console.log(this.discList);
-        }
-      })
-    }
-  },
-  components:{
-    slider
-  }
-
-}
-</script>
-
