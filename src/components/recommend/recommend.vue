@@ -1,5 +1,5 @@
 <template>
-  <div class="recommend">
+  <div class="recommend content">
       <scroll class="recommend-content" :data="discList">
         <div>
           <div v-if="recommends.length" class="slider-wrapper" ref="sliderWrapper">
@@ -22,6 +22,7 @@
                   <p class="desc" v-html="item.dissname"></p>
                 </div>
               </li>
+              <loading v-show="!discList.length"></loading>
             </ul>
           </div>
         </div>
@@ -33,6 +34,7 @@ import {ERR_OK} from 'api/config'
 import {getRecommend,getDiscList} from 'api/recommend'
 import slider from 'base/slider/slider'
 import scroll from 'base/scroll/scroll'
+import loading from 'base/loading/loading'
 export default {
   data () {
     return {
@@ -42,7 +44,9 @@ export default {
   },
   mounted(){
   	this._getRecommend();
-    this._getDiscList();
+    setTimeout(()=>{
+      this._getDiscList();
+    },1000);
   },
   methods:{
   	_getRecommend(){
@@ -62,32 +66,32 @@ export default {
   },
   components:{
     slider,
-    scroll
+    scroll,
+    loading
   }
 
 }
 </script>
 
 <style lang="stylus">
+@import '~common/stylus/variable'
+
 .recommend
-  position: fixed
-  width: 100%
-  top: 88px
-  bottom: 0
   .recommend-content
     height: 100%
     .slider-wrapper
       position: relative
       width: 100%
       overflow: hidden
-      text-align:center;
+      text-align:center
+      height:150px
       img
-        height:200px;
+        height:200px
       .swiper-pagination-bullet-active
-        width:20px;
-        border-radius:20px;
-        background:#fff;
-        opacity:0.6;
+        width:20px
+        border-radius:20px
+        background:#fff
+        opacity:0.6
     .recommend-list
       .list-title
         height: 65px

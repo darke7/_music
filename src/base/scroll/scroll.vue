@@ -40,13 +40,16 @@ export default{
     },
     refresh(){
       this.scroll&&this.scroll.refresh();
+    },
+    scrollToElement() {
+      this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
     }
   },
   watch: {
     data() {
       setTimeout(() => {
           this.refresh();
-      }, 100);
+      }, 20);
     }
   }
 }
