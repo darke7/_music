@@ -20,7 +20,9 @@ export default {
     }
   },
   mounted(){
-  	this._getSingerList();
+      setTimeout(()=>{
+        this._getSingerList();
+      },800);
   },
   methods:{
   	_getSingerList(){

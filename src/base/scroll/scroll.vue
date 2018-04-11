@@ -23,10 +23,16 @@ export default{
     data:{
       type:Array,
       default:null
+    },
+    listenScroll: {
+      type: Boolean,
+      default: false
     }
   },
-  updated(){
-    this.scrollInit();
+  mounted() {
+    setTimeout(() => {
+        this.scrollInit();
+    }, 20);
   },
   methods:{
     scrollInit(){
@@ -37,6 +43,11 @@ export default{
         probeType: this.probeType,
         click: this.click,
       });
+      if (this.listenScroll) {
+        this.scroll.on("scroll", pos => {
+            this.$emit("scroll", pos);
+        });
+      }
     },
     refresh(){
       this.scroll&&this.scroll.refresh();
@@ -56,5 +67,5 @@ export default{
 </script>
 
 <style lang="stylus">
-
 </style>
+
