@@ -1,5 +1,5 @@
 <template>
-  <div class="recommend content">
+  <div class="recommend">
       <scroll class="recommend-content" :data="discList">
         <div>
           <div v-if="recommends.length" class="slider-wrapper" ref="sliderWrapper">
@@ -77,6 +77,10 @@ export default {
 @import '~common/stylus/variable'
 
 .recommend
+  position: fixed
+  width: 100%
+  top: 88px
+  bottom: 0
   .recommend-content
     height: 100%
     .slider-wrapper
