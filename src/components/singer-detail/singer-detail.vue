@@ -1,20 +1,61 @@
 <template>
   <transition name="slide">
-    <div class="singer-detail"></div>
+    <music-list :title="title" :bgImage="bgImage" :songs="songs"></music-list>
   </transition>
 </template>
 
 <script type="text/ecmascript-6">
 import {mapGetters} from 'vuex'
+import {getSingerDetail} from 'api/singer.js'
+import {ERR_OK} from 'api/config.js'
+import {createSong} from 'common/js/song.js'
+import musicList from 'components/music-list/music-list'
 
  export default{
+  data(){
+    return {
+      songs:[]
+    }
+  },
   computed:{
     ...mapGetters([
         'singer'
-      ])
+      ]),
+    title(){
+      return this.singer.name;
+    },
+    bgImage(){
+      return this.singer.avatar;
+    }
   },
   created(){
-    console.log(this.singer);
+    this._getSingerDetail();
+  },
+  methods:{
+    _getSingerDetail(){
+      if(!this.singer.id){
+        this.$router.push('/singer');
+        return ;
+      }
+      getSingerDetail(this.singer.id).then((res)=>{
+        if(res.code === ERR_OK){
+          this.songs = this._normalizeSongs(res.data.list);
+        }
+      });
+    },
+    _normalizeSongs(list){
+      let ret = [];
+      list.forEach((item)=>{
+        let {musicData} = item;
+        if(musicData.songmid&&musicData.albummid){
+          ret.push(createSong(musicData));
+        }
+      });
+      return ret;
+    }
+  },
+  components:{
+    musicList
   }
  }
 </script>
@@ -26,13 +67,4 @@ import {mapGetters} from 'vuex'
 
 .slide-enter, .slide-leave-to
 	transform: translate3d(100%, 0, 0)
-.singer-detail
-  position: fixed
-  z-index: 100
-  top: 0
-  left: 0
-  bottom: 0
-  right: 0
-  background: $color-background
-
 </style>
