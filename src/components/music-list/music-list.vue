@@ -80,17 +80,17 @@ const RESERVED_HEIGHT = 40
         this.$refs.layer.style['transform'] = `translate3d(0,${translateY}px,0)`
         this.$refs.filter.style['filter'] = `blur(${blur}px)`
         if (newVal < this.minTransalteY) {
-          this.$refs.bgImage.style.zIndex = 10
+          zIndex = 1;
           this.$refs.bgImage.style.paddingTop = 0
           this.$refs.bgImage.style.height = `${RESERVED_HEIGHT}px`
           this.$refs.playBtn.style.display = 'none'
         } else {
           this.$refs.bgImage.style.paddingTop = '70%'
           this.$refs.bgImage.style.height = 0
-          this.$refs.playBtn.style.display = 'block'
-          this.$refs.bgImage.style.zIndex = 0
+          this.$refs.playBtn.style.display = ''
         }
         this.$refs.bgImage.style['transform'] = `scale(${scale})`
+        this.$refs.bgImage.style.zIndex = zIndex
       }
     },
     components:{
