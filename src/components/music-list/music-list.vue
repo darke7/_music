@@ -1,15 +1,17 @@
 <template>
   <div class="music-list">
-    <div class="back" >
-      <i class="icon-back"></i>
+    <div class="back" @click="back" ref="playBtn">
+      <i class="icon-back">back</i>
     </div>
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
       <div class="filter" ref="filter"></div>
     </div>
-    <scroll :data="songs" class="list" ref="list">
+    <div class="bg-layer" ref="layer"></div>
+    <scroll :data="songs" class="list" @scroll="scroll"
+            :listen-scroll="listenScroll" :probe-type="probeType" ref="list">
       <div class="song-list-wrapper">
-        <song-list :songs="songs"></song-list>
+        <song-list :songs="songs" ></song-list>
       </div>
     </scroll>
   </div>
@@ -18,7 +20,14 @@
 <script type="text/ecmascript-6">
 import scroll from 'base/scroll/scroll'
 import songList from 'base/song-list/song-list'
+
+const RESERVED_HEIGHT = 40
   export default {
+    data() {
+      return {
+        scrollY: 0
+      }
+    },
     props: {
       bgImage: {
         type: String,
@@ -33,12 +42,55 @@ import songList from 'base/song-list/song-list'
         default: ''
       }
     },
+    created() {
+      this.probeType = 3
+      this.listenScroll = true
+    },
     mounted(){
-      this.$refs.list.$el.style.top = this.$refs.bgImage.clientHeight+'px';
+      this.imageHeight = this.$refs.bgImage.clientHeight
+      this.minTransalteY = -this.imageHeight + RESERVED_HEIGHT
+      this.$refs.list.$el.style.top = `${this.imageHeight}px`
+    },
+    methods: {
+      scroll(pos) {
+        this.scrollY = pos.y
+      },
+      back() {
+        this.$router.back()
+      }
     },
     computed: {
       bgStyle() {
         return `background-image:url(${this.bgImage})`
+      }
+    },
+    watch: {
+      scrollY(newVal) {
+        let translateY = Math.max(this.minTransalteY, newVal)
+        let scale = 1
+        let zIndex = 0
+        let blur = 0
+        const percent = Math.abs(newVal / this.imageHeight)
+        if (newVal > 0) {
+          scale = 1 + percent
+          zIndex = 10
+        } else {
+          blur = Math.min(20, percent * 20)
+        }
+        this.$refs.layer.style['transform'] = `translate3d(0,${translateY}px,0)`
+        this.$refs.filter.style['filter'] = `blur(${blur}px)`
+        if (newVal < this.minTransalteY) {
+          this.$refs.bgImage.style.zIndex = 10
+          this.$refs.bgImage.style.paddingTop = 0
+          this.$refs.bgImage.style.height = `${RESERVED_HEIGHT}px`
+          this.$refs.playBtn.style.display = 'none'
+        } else {
+          this.$refs.bgImage.style.paddingTop = '70%'
+          this.$refs.bgImage.style.height = 0
+          this.$refs.playBtn.style.display = 'block'
+          this.$refs.bgImage.style.zIndex = 0
+        }
+        this.$refs.bgImage.style['transform'] = `scale(${scale})`
       }
     },
     components:{
@@ -60,8 +112,6 @@ import songList from 'base/song-list/song-list'
     bottom: 0
     right: 0
     background: $color-background
-    .song-list-wrapper
-        padding: 20px 30px
     .back
       position absolute
       top: 0
@@ -90,6 +140,7 @@ import songList from 'base/song-list/song-list'
       padding-top: 70%
       transform-origin: top
       background-size: cover
+      overflow:hidden
       .play-wrapper
         position: absolute
         bottom: 20px
