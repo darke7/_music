@@ -1,7 +1,7 @@
 <template>
   <div class="music-list">
     <div class="back" @click="back">
-      <i class="icon-back">back</i>
+      <i class="icon-back"></i>
     </div>
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
@@ -15,7 +15,7 @@
     <scroll :data="songs" class="list" @scroll="scroll"
             :listen-scroll="listenScroll" :probe-type="probeType" ref="list">
       <div class="song-list-wrapper">
-        <song-list :songs="songs" ></song-list>
+        <song-list :songs="songs" @select="select"></song-list>
       </div>
     </scroll>
   </div>
@@ -25,6 +25,7 @@
 import scroll from 'base/scroll/scroll'
 import songList from 'base/song-list/song-list'
 import {prefixStyle} from 'common/js/dom'
+import {mapActions} from 'vuex'
 
 const RESERVED_HEIGHT = 40
 const transform = prefixStyle('transform');
@@ -65,7 +66,16 @@ const backdrop = prefixStyle('backdrop-filter');
       },
       back() {
         this.$router.back()
-      }
+      },
+      select(item,index){
+        this.selectPlay({
+          list:this.songs,
+          index
+        });
+      },
+      ...mapActions([
+          'selectPlay'
+        ])
     },
     computed: {
       bgStyle() {
