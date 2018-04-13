@@ -1,10 +1,14 @@
 <template>
   <div class="music-list">
-    <div class="back" @click="back" ref="playBtn">
+    <div class="back" @click="back">
       <i class="icon-back">back</i>
     </div>
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
+      <div ref="playBtn" v-show="songs.length" class="play">
+        <i class="icon-play"></i>
+        <span class="text">随机播放全部</span>
+      </div>
       <div class="filter" ref="filter"></div>
     </div>
     <div class="bg-layer" ref="layer"></div>
@@ -20,8 +24,12 @@
 <script type="text/ecmascript-6">
 import scroll from 'base/scroll/scroll'
 import songList from 'base/song-list/song-list'
+import {prefixStyle} from 'common/js/dom'
 
 const RESERVED_HEIGHT = 40
+const transform = prefixStyle('transform');
+const backdrop = prefixStyle('backdrop-filter');
+
   export default {
     data() {
       return {
@@ -77,8 +85,8 @@ const RESERVED_HEIGHT = 40
         } else {
           blur = Math.min(20, percent * 20)
         }
-        this.$refs.layer.style['transform'] = `translate3d(0,${translateY}px,0)`
-        this.$refs.filter.style['filter'] = `blur(${blur}px)`
+        this.$refs.layer.style[transform] = `translate3d(0,${translateY}px,0)`
+        this.$refs.filter.style[backdrop] = `blur(${blur}px)`
         if (newVal < this.minTransalteY) {
           zIndex = 1;
           this.$refs.bgImage.style.paddingTop = 0
@@ -89,7 +97,7 @@ const RESERVED_HEIGHT = 40
           this.$refs.bgImage.style.height = 0
           this.$refs.playBtn.style.display = ''
         }
-        this.$refs.bgImage.style['transform'] = `scale(${scale})`
+        this.$refs.bgImage.style[transform] = `scale(${scale})`
         this.$refs.bgImage.style.zIndex = zIndex
       }
     },
@@ -141,37 +149,33 @@ const RESERVED_HEIGHT = 40
       transform-origin: top
       background-size: cover
       overflow:hidden
-      .play-wrapper
-        position: absolute
-        bottom: 20px
-        z-index: 50
-        width: 100%
-        .play
-          box-sizing: border-box
-          width: 135px
-          padding: 7px 0
-          margin: 0 auto
-          text-align: center
-          border: 1px solid $color-theme
-          color: $color-theme
-          border-radius: 100px
-          font-size: 0
-          .icon-play
-            display: inline-block
-            vertical-align: middle
-            margin-right: 6px
-            font-size: $font-size-medium-x
-          .text
-            display: inline-block
-            vertical-align: middle
-            font-size: $font-size-small
-      .filter
-        position: absolute
-        top: 0
-        left: 0
-        width: 100%
-        height: 100%
-        background: rgba(7, 17, 27, 0.4)
+      .play
+        box-sizing: border-box
+        width: 135px
+        padding: 7px 0
+        margin: 0 auto
+        text-align: center
+        border: 1px solid $color-theme
+        color: $color-theme
+        border-radius: 100px
+        margin-top:-50px;
+        font-size: 0
+        .icon-play
+          display: inline-block
+          vertical-align: middle
+          margin-right: 6px
+          font-size: $font-size-medium-x
+        .text
+          display: inline-block
+          vertical-align: middle
+          font-size: $font-size-small
+    .filter
+      position: absolute
+      top: 0
+      left: 0
+      width: 100%
+      height: 100%
+      background: rgba(7, 17, 27, 0.4)
     .bg-layer
       position: relative
       height: 100%
