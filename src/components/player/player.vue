@@ -62,6 +62,7 @@
         <div class="control" >
           <i class="icon-playlist"></i>
         </div>
+        <audio autoplay="true" :src="currentSong.url"></audio>
       </div>
     </transition>
   </div>
@@ -81,6 +82,11 @@ export default {
         'playlist',
         'currentSong'
       ])
+  },
+  watch:{
+    currentSong(v){
+      console.log(v);
+    }
   },
   methods:{
     back(){

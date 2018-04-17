@@ -35,6 +35,7 @@ import {getRecommend,getDiscList} from 'api/recommend'
 import slider from 'base/slider/slider'
 import scroll from 'base/scroll/scroll'
 import loading from 'base/loading/loading'
+import axios from 'axios'
 export default {
   data () {
     return {
@@ -47,6 +48,9 @@ export default {
     setTimeout(()=>{
       this._getDiscList();
     },1000);
+    axios.get('static/ECHO.mp3').then((res)=>{
+      console.log(res);
+    });
   },
   methods:{
   	_getRecommend(){
