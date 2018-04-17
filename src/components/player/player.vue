@@ -20,7 +20,7 @@
         <div class="middle">
           <div class="middle-l" ref="middleL">
             <div class="cd-wrapper" ref="cdWrapper">
-              <div class="cd" >
+              <div class="cd" :class="cdCls">
                 <img class="image" :src="currentSong.image">
               </div>
             </div>
@@ -35,7 +35,7 @@
               <i class="icon-prev"></i>
             </div>
             <div class="icon i-center">
-              <i class="icon-play"></i>
+              <i @click="tagglePlaying" :class="playIcon"></i>
             </div>
             <div class="icon i-right" >
               <i  class="icon-next"></i>
@@ -49,20 +49,20 @@
     </transition>
     <transition name="mini">
       <div class="mini-player" v-show="!fullScreen" @click="open">
-        <div class="icon">
-          <img  width="40" height="40" :src="currentSong.image">
+        <div class="icon" >
+          <img :class="cdCls" width="40" height="40" :src="currentSong.image">
         </div>
         <div class="text">
           <h2 class="name" v-html="currentSong.name"></h2>
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
-
+          <i @click.stop="tagglePlaying" class="icon-mini" :class="miniIcon"></i>
         </div>
-        <div class="control" >
+        <div class="control">
           <i class="icon-playlist"></i>
         </div>
-        <audio autoplay="true" :src="currentSong.url"></audio>
+        <audio ref='audio' :src="currentSong.url"></audio>
       </div>
     </transition>
   </div>
@@ -77,18 +77,39 @@ const transform = prefixStyle('transform')
 
 export default {
   computed:{
+    cdCls(){
+      return this.playing?'play':'play pause';
+    },
+    playIcon(){
+      return !this.playing?'icon-play':'icon-pause';
+    },
+    miniIcon(){
+      return !this.playing?'icon-play-mini':'icon-pause-mini';
+    },
     ...mapGetters([
         'fullScreen',
         'playlist',
-        'currentSong'
+        'currentSong',
+        'playing'
       ])
   },
   watch:{
     currentSong(v){
-      console.log(v);
+     this.$nextTick(function() {
+       this.$refs.audio.play();
+     })
+    },
+    playing(v){
+      let audio = this.$refs.audio;
+      this.$nextTick(function(){
+        audio[this.playing?'play':'pause']();
+      });
     }
   },
   methods:{
+    tagglePlaying(){
+      this.setPlayingState(!this.playing);
+    },
     back(){
       this.setPlayer(false);
     },
@@ -154,7 +175,8 @@ export default {
       }
     },
     ...mapMutations({
-      setPlayer:'SET_FULL_SCREEN'
+      setPlayer:'SET_FULL_SCREEN',
+      setPlayingState:'SET_PLAYING_STATE'
     })
   }
 }
@@ -392,8 +414,8 @@ export default {
         .icon-mini
           font-size: 32px
           position: absolute
-          left: 0
-          top: 0
+          right: 70px;
+          top: 15px;
 
   @keyframes rotate
     0%
