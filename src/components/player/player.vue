@@ -244,7 +244,6 @@ export default {
         interval = interval | 0;
         const minute = (interval / 60) | 0;
         const second = pad(interval % 60);
-        this.oo();
         return `${minute}:${second}`;
     }
   }
