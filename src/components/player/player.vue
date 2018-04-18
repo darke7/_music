@@ -34,7 +34,7 @@
           <div class="progress-wrapper">
             <span class="time time-l">{{currentTime|format}}</span>
             <div class="progress-bar-wrapper">
-              <progress-bar :percent="percent"></progress-bar>
+              <progress-bar :percent="percent" @schedule="schedule"></progress-bar>
             </div>
             <span class="time time-r">{{currentSong.duration|format}}</span>
           </div>
@@ -133,6 +133,12 @@ export default {
     }
   },
   methods:{
+    schedule(jd){
+      this.$refs.audio.currentTime = this.currentSong.duration*jd;
+      if(!this.playing){
+        this.tagglePlaying();
+      }
+    },
     timeUpdate(e){
       this.currentTime = e.target.currentTime;
     },
