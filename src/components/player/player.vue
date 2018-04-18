@@ -27,6 +27,17 @@
           </div>
         </div>
         <div class="bottom">
+          <div class="dot-wrapper">
+            <span class="dot" ></span>
+            <span class="dot" ></span>
+          </div>
+          <div class="progress-wrapper">
+            <span class="time time-l">{{currentTime|format}}</span>
+            <div class="progress-bar-wrapper">
+              <!-- <progress-bar :percent="percent" @percentChange="onProgressBarChange"></progress-bar> -->
+            </div>
+            <span class="time time-r"></span>
+          </div>
           <div class="operators">
             <div class="icon i-left">
               <i class="icon-sequence"></i>
@@ -62,7 +73,7 @@
         <div class="control">
           <i class="icon-playlist"></i>
         </div>
-        <audio ref='audio' :src="currentSong.url" @canplay="read" @error="error"></audio>
+        <audio ref='audio' :src="currentSong.url" @canplay="read" @error="error" @timeupdate="timeUpdate"></audio>
       </div>
     </transition>
   </div>
@@ -78,7 +89,8 @@ const transform = prefixStyle('transform')
 export default {
   data(){
     return {
-      songRead:false
+      songRead:false,
+      currentTime:0
     }
   },
   computed:{
@@ -117,6 +129,9 @@ export default {
     }
   },
   methods:{
+    timeUpdate(e){
+      this.currentTime = e.target.currentTime;
+    },
     error(){
        this.songRead = true;
     },
@@ -215,6 +230,23 @@ export default {
       setPlayingState:'SET_PLAYING_STATE',
       setCurrentIndex:'SET_CURRENT_INDEX'
     })
+  },
+  filters:{
+    format(interval) {
+        let pad = (num, n = 2)=>{
+            let len = num.toString().length;
+            while (len < n) {
+                num = "0" + num;
+                len++;
+            }
+            return num;
+        }
+        interval = interval | 0;
+        const minute = (interval / 60) | 0;
+        const second = pad(interval % 60);
+        this.oo();
+        return `${minute}:${second}`;
+    }
   }
 }
 </script>
