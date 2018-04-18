@@ -31,14 +31,14 @@
             <div class="icon i-left">
               <i class="icon-sequence"></i>
             </div>
-            <div class="icon i-left" >
-              <i class="icon-prev"></i>
+            <div class="icon i-left" :class="disableCls">
+              <i @click="prev" class="icon-prev"></i>
             </div>
-            <div class="icon i-center">
+            <div class="icon i-center" :class="disableCls">
               <i @click="tagglePlaying" :class="playIcon"></i>
             </div>
-            <div class="icon i-right" >
-              <i  class="icon-next"></i>
+            <div class="icon i-right" :class="disableCls">
+              <i @click="next" class="icon-next"></i>
             </div>
             <div class="icon i-right">
               <i  class="icon-not-favorite" ></i>
@@ -62,7 +62,7 @@
         <div class="control">
           <i class="icon-playlist"></i>
         </div>
-        <audio ref='audio' :src="currentSong.url"></audio>
+        <audio ref='audio' :src="currentSong.url" @canplay="read" @error="error"></audio>
       </div>
     </transition>
   </div>
@@ -76,7 +76,15 @@ import {prefixStyle} from 'common/js/dom'
 const transform = prefixStyle('transform')
 
 export default {
+  data(){
+    return {
+      songRead:false
+    }
+  },
   computed:{
+    disableCls(){
+      return this.songRead?"":"disable";
+    },
     cdCls(){
       return this.playing?'play':'play pause';
     },
@@ -90,13 +98,15 @@ export default {
         'fullScreen',
         'playlist',
         'currentSong',
-        'playing'
+        'playing',
+        'currentIndex'
       ])
   },
   watch:{
     currentSong(v){
      this.$nextTick(function() {
        this.$refs.audio.play();
+       this.setPlayingState(true);
      })
     },
     playing(v){
@@ -107,8 +117,34 @@ export default {
     }
   },
   methods:{
+    error(){
+       this.songRead = true;
+    },
+    read(){
+      this.songRead = true;
+    },
+    next(){
+      if(this.songRead){
+        let index = this.currentIndex+1;
+        if(index === this.playlist.length){
+          index = 0;
+        }
+        this.setCurrentIndex(index);
+        this.songRead = false;
+      }
+    },
+    prev(){
+      if(this.songRead){
+        let index = this.currentIndex-1;
+        if(index === -1){
+          index = this.playlist.length-1;
+        }
+        this.setCurrentIndex(index);
+        this.songRead = false;
+      }
+    },
     tagglePlaying(){
-      this.setPlayingState(!this.playing);
+        this.setPlayingState(!this.playing);
     },
     back(){
       this.setPlayer(false);
@@ -176,7 +212,8 @@ export default {
     },
     ...mapMutations({
       setPlayer:'SET_FULL_SCREEN',
-      setPlayingState:'SET_PLAYING_STATE'
+      setPlayingState:'SET_PLAYING_STATE',
+      setCurrentIndex:'SET_CURRENT_INDEX'
     })
   }
 }
