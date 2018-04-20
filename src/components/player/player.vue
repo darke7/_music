@@ -143,7 +143,9 @@ export default {
       this.$nextTick(function() {
         this.$refs.audio.play();
         this.setPlayingState(true);
-        this.currentSong.getLyric();
+        this.currentSong.getLyric().then((res)=>{
+          console.log(res);
+        });
       })
     },
     playing(v){
