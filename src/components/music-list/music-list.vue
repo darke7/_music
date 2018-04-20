@@ -5,7 +5,7 @@
     </div>
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
-      <div ref="playBtn" v-show="songs.length" class="play">
+      <div ref="playBtn" @click="_randomPlay" v-show="songs.length" class="play">
         <i class="icon-play"></i>
         <span class="text">随机播放全部</span>
       </div>
@@ -61,6 +61,11 @@ const backdrop = prefixStyle('backdrop-filter');
       this.$refs.list.$el.style.top = `${this.imageHeight}px`
     },
     methods: {
+      _randomPlay(){
+        this.randomPlay({
+          list:this.songs
+        });
+      },
       scroll(pos) {
         this.scrollY = pos.y
       },
@@ -74,7 +79,8 @@ const backdrop = prefixStyle('backdrop-filter');
         });
       },
       ...mapActions([
-          'selectPlay'
+          'selectPlay',
+          'randomPlay'
         ])
     },
     computed: {
@@ -160,6 +166,8 @@ const backdrop = prefixStyle('backdrop-filter');
       background-size: cover
       overflow:hidden
       .play
+        position:relative
+        z-index:6;
         box-sizing: border-box
         width: 135px
         padding: 7px 0

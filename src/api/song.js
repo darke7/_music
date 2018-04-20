@@ -25,6 +25,7 @@ export function getSongsUrl(songs) {
         uin: 0
     })
 
+
     return new Promise((reslove, reject) => {
         let tryTime = 3
         function request() {
@@ -98,4 +99,24 @@ export function getUid() {
         _uid = '' + Math.round(2147483647 * Math.random()) * t % 1e10
     }
     return _uid
+}
+
+export function getLyric(mid) {
+  const url = '/api/lyric'
+
+  const data = Object.assign({}, commonParams, {
+    songmid: mid,
+    platform: 'yqq',
+    hostUin: 0,
+    needNewCode: 0,
+    categoryId: 10000000,
+    pcachetime: +new Date(),
+    format: 'json'
+  })
+
+  return axios.get(url, {
+    params: data
+  }).then((res) => {
+    return Promise.resolve(res.data)
+  })
 }

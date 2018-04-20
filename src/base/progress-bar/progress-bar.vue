@@ -15,10 +15,8 @@
 
 <script type="text/ecmascript-6">
 import {prefixStyle} from 'common/js/dom.js'
-
 const progressBtnWidth = 16;
 const transform = prefixStyle('transform');
-
   export default {
     props: {
       percent: {
@@ -31,7 +29,10 @@ const transform = prefixStyle('transform');
     },
     methods:{
       progressClick(e){
-        this._offset(e.offsetX);
+        const rect = this.$refs.progressBar.getBoundingClientRect()
+        const offsetWidth = e.pageX - rect.left
+        this._offset(offsetWidth)
+        // this._offset(e.offsetX);
         this._exmitSchedule();
       },
       progressStart(e){
@@ -75,7 +76,6 @@ const transform = prefixStyle('transform');
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/variable"
-
   .progress-bar
     height: 30px
     .bar-inner
