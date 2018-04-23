@@ -18,19 +18,33 @@
           <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
         <div class="middle">
-          <div class="middle-l" ref="middleL">
-            <div class="cd-wrapper" ref="cdWrapper">
-              <div class="cd" :class="cdCls">
-                <img class="image" :src="currentSong.image">
+          <slider swipeid="player-swipe"
+                  :obj="{effect:'flip',flip:{slideShadows : true,limitRotation : true}}"
+          >
+            <div class="swiper-slide" slot="swiper-con" >
+              <div class="middle-l" ref="middleL">
+                <div class="cd-wrapper" ref="cdWrapper">
+                  <div class="cd" :class="cdCls">
+                    <img class="image" :src="currentSong.image">
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+            <div class="swiper-slide" slot="swiper-con">
+              <div class="middle-r" ref="lyricList">
+                <div class="lyric-wrapper">
+                  <div v-if="currentLyric">
+                    <p ref="lyricLine"
+                       class="text"
+                       :class="{'current': currentLineNum ===index}"
+                       v-for="(line,index) in currentLyric.lines">{{line.txt}}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </slider>
         </div>
         <div class="bottom">
-          <div class="dot-wrapper">
-            <span class="dot" ></span>
-            <span class="dot" ></span>
-          </div>
           <div class="progress-wrapper">
             <span class="time time-l">{{currentTime|format}}</span>
             <div class="progress-bar-wrapper">
@@ -89,6 +103,8 @@ import progressBar from 'base/progress-bar/progress-bar.vue'
 import progressCircle from 'base/progress-circle/progress-circle.vue'
 import {playMode} from 'common/js/config.js'
 import {shuffle} from 'common/js/util.js'
+import Lyric from 'lyric-parser'
+import slider from 'base/slider/slider'
 
 const transform = prefixStyle('transform')
 
@@ -96,7 +112,9 @@ export default {
   data(){
     return {
       songRead:false,
-      currentTime:0
+      currentTime:0,
+      currentLyric:null,
+      currentLineNum:0
     }
   },
   computed:{
@@ -144,7 +162,16 @@ export default {
         this.$refs.audio.play();
         this.setPlayingState(true);
         this.currentSong.getLyric().then((res)=>{
-          console.log(res);
+          // console.log(res);
+          let that = this;
+          this.currentLyric = new Lyric(res,({lineNum,txt})=>{
+            that.currentLineNum = lineNum;
+            console.log(lineNum);
+          });
+          // console.log(this.currentLyric);
+          if(this.playing){
+            this.currentLyric.play();
+          }
         });
       })
     },
@@ -313,7 +340,8 @@ export default {
   },
   components:{
     progressBar,
-    progressCircle
+    progressCircle,
+    slider
   }
 }
 </script>
@@ -374,6 +402,10 @@ export default {
         bottom: 170px
         white-space: nowrap
         font-size: 0
+        .swiper-slide
+          visibility:hidden
+        .swiper-slide-active
+          visibility:visible
         .middle-l
           display: inline-block
           vertical-align: top

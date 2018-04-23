@@ -1,6 +1,7 @@
 <template>
   <div>
       search
+
   </div>
 </template>
 
@@ -9,7 +10,12 @@ export default {
   data () {
     return {
     }
+  },
+  components:{
+
   }
 }
 </script>
+
+
 

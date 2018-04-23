@@ -20,7 +20,7 @@
     props: {
       swipeid: {
         type: String,
-        default: ""
+        default: "swipe"
       },
       effect: {
         type: String,
@@ -45,6 +45,10 @@
       autoplay: {
         type: Number,
         default: 0
+      },
+      obj:{
+        type:Object,
+        default:null
       }
     },
     mounted(){
@@ -54,27 +58,31 @@
         //用户操作swiper之后，不禁止autoplay
         disableOnInteraction: false,
       }:false;
-      this.dom = new Swiper("." + that.swipeid, {
+      let option = {
         //循环
-        loop: that.loop,
+        loop: this.loop,
         //分页器
         pagination: {
           el: ".swiper-pagination",
           bulletClass : 'swiper-pagination-bullet',
         },
         //分页类型
-        paginationType: that.paginationType,
+        paginationType: this.paginationType,
         //自动播放
         autoplay: _autoplay,
         //方向
-        direction: that.direction,
+        direction: this.direction,
         //特效
-        effect: that.effect,
+        effect: this.effect,
         //修改swiper自己或子元素时，自动初始化swiper
         observer: true,
         //修改swiper的父元素时，自动初始化swiper
         observeParents: true
-      });
+      };
+      if(this.obj){
+        Object.assign(option,this.obj);
+      }
+      this.dom = new Swiper("." + that.swipeid, option);
     },
     activated(){
       this.dom.attachEvents();
@@ -90,3 +98,8 @@
   }
 </script>
 
+<style lang="stylus">
+  .swiper-container
+    width:100%
+    height:100%
+</style>
