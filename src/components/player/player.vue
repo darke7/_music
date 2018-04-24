@@ -17,21 +17,27 @@
           <h1 class="title" v-html="currentSong.name"></h1>
           <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
-        <div class="middle">
-          <slider swipeid="player-swipe"
+        <div class="middle"
+             @touchstart.prevent="middleTouchStart"
+             @touchmove.prevent="middleTouchMove"
+             @touchend="middleTouchEnd">
+     <!--      <slider swipeid="player-swipe"
                   :obj="{effect:'flip',flip:{slideShadows : true,limitRotation : true}}"
           >
-            <div class="swiper-slide" slot="swiper-con" >
+            <div class="swiper-slide" slot="swiper-con" > -->
               <div class="middle-l" ref="middleL">
                 <div class="cd-wrapper" ref="cdWrapper">
                   <div class="cd" :class="cdCls">
                     <img class="image" :src="currentSong.image">
                   </div>
                 </div>
+                <div class="playing-lyric-wrapper">
+                  <div class="playing-lyric">{{playingLyric}}</div>
+                </div>
               </div>
-            </div>
-            <div class="swiper-slide" slot="swiper-con">
-              <div class="middle-r" ref="lyricList">
+           <!--  </div>
+            <div class="swiper-slide"  slot="swiper-con"> -->
+              <scroll class="middle-r" ref="lyricList" :data="currentLyric&&currentLyric.lines">
                 <div class="lyric-wrapper">
                   <div v-if="currentLyric">
                     <p ref="lyricLine"
@@ -40,11 +46,15 @@
                        v-for="(line,index) in currentLyric.lines">{{line.txt}}</p>
                   </div>
                 </div>
-              </div>
-            </div>
-          </slider>
+              </scroll>
+           <!--  </div>
+          </slider> -->
         </div>
         <div class="bottom">
+          <div class="dot-wrapper">
+            <span class="dot" :class="{'active':currentShow==='cd'}"></span>
+            <span class="dot" :class="{'active':currentShow==='lyric'}"></span>
+          </div>
           <div class="progress-wrapper">
             <span class="time time-l">{{currentTime|format}}</span>
             <div class="progress-bar-wrapper">
@@ -104,9 +114,11 @@ import progressCircle from 'base/progress-circle/progress-circle.vue'
 import {playMode} from 'common/js/config.js'
 import {shuffle} from 'common/js/util.js'
 import Lyric from 'lyric-parser'
-import slider from 'base/slider/slider'
+// import slider from 'base/slider/slider'
+import scroll from 'base/scroll/scroll'
 
 const transform = prefixStyle('transform')
+const transitionDuration = prefixStyle('transitionDuration')
 
 export default {
   data(){
@@ -114,8 +126,13 @@ export default {
       songRead:false,
       currentTime:0,
       currentLyric:null,
-      currentLineNum:0
+      currentLineNum:0,
+      currentShow: 'cd',
+      playingLyric: ''
     }
+  },
+  created() {
+    this.touch = {}
   },
   computed:{
     modeIcon(){
@@ -158,22 +175,39 @@ export default {
       if(newV.id === afterV.id){
         return;
       }
-      this.$nextTick(function() {
+      if (this.currentLyric) {
+        this.currentLyric.stop()
+        this.currentTime = 0
+        this.playingLyric = ''
+        this.currentLineNum = 0
+      }
+      this.timer = setTimeout(() => {
+        let that = this;
         this.$refs.audio.play();
         this.setPlayingState(true);
         this.currentSong.getLyric().then((res)=>{
           // console.log(res);
-          let that = this;
           this.currentLyric = new Lyric(res,({lineNum,txt})=>{
             that.currentLineNum = lineNum;
-            console.log(lineNum);
+            if(lineNum>5){
+              let lineEl = that.$refs.lyricLine[lineNum-5]
+              that.$refs.lyricList.scrollToElement(lineEl,1000);
+            }else{
+              let lineElStart = that.$refs.lyricLine[0]
+              that.$refs.lyricList.scrollToElement(lineElStart,1000);
+            }
+            this.playingLyric = txt
           });
           // console.log(this.currentLyric);
           if(this.playing){
             this.currentLyric.play();
           }
+        }).catch(() => {
+          this.currentLyric = null
+          this.playingLyric = ''
+          this.currentLineNum = 0
         });
-      })
+      },1000)
     },
     playing(v){
       let audio = this.$refs.audio;
@@ -183,6 +217,68 @@ export default {
     }
   },
   methods:{
+    middleTouchStart(e) {
+      this.touch.initiated = true
+      // 用来判断是否是一次移动
+      this.touch.moved = false
+      const touch = e.touches[0]
+      this.touch.startX = touch.pageX
+      this.touch.startY = touch.pageY
+    },
+    middleTouchMove(e) {
+      if (!this.touch.initiated) {
+        return
+      }
+      const touch = e.touches[0]
+      const deltaX = touch.pageX - this.touch.startX
+      const deltaY = touch.pageY - this.touch.startY
+      // console.log(deltaX);
+      if (Math.abs(deltaY) > Math.abs(deltaX)) {
+        return
+      }
+      if (!this.touch.moved) {
+        this.touch.moved = true
+      }
+      const left = this.currentShow === 'cd' ? 0 : -window.innerWidth
+      const offsetWidth = Math.min(0, Math.max(-window.innerWidth, left + deltaX))
+      this.touch.percent = Math.abs(offsetWidth / window.innerWidth)
+      this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`
+      this.$refs.lyricList.$el.style[transitionDuration] = 0
+      this.$refs.middleL.style.opacity = 1 - this.touch.percent
+      this.$refs.middleL.style[transitionDuration] = 0
+    },
+    middleTouchEnd() {
+      if (!this.touch.moved) {
+        return
+      }
+      let offsetWidth
+      let opacity
+      if (this.currentShow === 'cd') {
+        if (this.touch.percent > 0.1) {
+          offsetWidth = -window.innerWidth
+          opacity = 0
+          this.currentShow = 'lyric'
+        } else {
+          offsetWidth = 0
+          opacity = 1
+        }
+      } else {
+        if (this.touch.percent < 0.9) {
+          offsetWidth = 0
+          this.currentShow = 'cd'
+          opacity = 1
+        } else {
+          offsetWidth = -window.innerWidth
+          opacity = 0
+        }
+      }
+      const time = 300
+      this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`
+      this.$refs.lyricList.$el.style[transitionDuration] = `${time}ms`
+      this.$refs.middleL.style.opacity = opacity
+      this.$refs.middleL.style[transitionDuration] = `${time}ms`
+      this.touch.initiated = false
+    },
     end(){
       if(this.mode === playMode.loop){
         this.loop();
@@ -193,6 +289,9 @@ export default {
     loop(){
       this.$refs.audio.currentTime = 0;
       this.$refs.audio.play();
+      if (this.currentLyric) {
+        this.currentLyric.seek(0)
+      }
     },
     changeMode(){
       const mode = (this.mode+1)%3;
@@ -229,26 +328,39 @@ export default {
     },
     next(){
       if(this.songRead){
-        let index = this.currentIndex+1;
-        if(index === this.playlist.length){
-          index = 0;
+        if (this.playlist.length === 1) {
+          this.loop()
+          return
+        } else {
+          let index = this.currentIndex+1;
+          if(index === this.playlist.length){
+            index = 0;
+          }
+          this.setCurrentIndex(index);
+          this.songRead = false;
         }
-        this.setCurrentIndex(index);
-        this.songRead = false;
       }
     },
     prev(){
       if(this.songRead){
-        let index = this.currentIndex-1;
-        if(index === -1){
-          index = this.playlist.length-1;
+        if (this.playlist.length === 1) {
+          this.loop()
+          return
+        } else {
+          let index = this.currentIndex-1;
+          if(index === -1){
+            index = this.playlist.length-1;
+          }
+          this.setCurrentIndex(index);
+          this.songRead = false;
         }
-        this.setCurrentIndex(index);
-        this.songRead = false;
       }
     },
     tagglePlaying(){
         this.setPlayingState(!this.playing);
+        if (this.currentLyric) {
+          this.currentLyric.togglePlay()
+        }
     },
     back(){
       this.setPlayer(false);
@@ -341,7 +453,8 @@ export default {
   components:{
     progressBar,
     progressCircle,
-    slider
+    // slider,
+    scroll
   }
 }
 </script>
