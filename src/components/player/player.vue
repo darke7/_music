@@ -316,6 +316,10 @@ export default {
       if(!this.playing){
         this.tagglePlaying();
       }
+      this.currentTime = this.$refs.audio.currentTime
+      if (this.currentLyric) {
+        this.currentLyric.seek(this.currentTime * 1000)
+      }
     },
     timeUpdate(e){
       this.currentTime = e.target.currentTime;
