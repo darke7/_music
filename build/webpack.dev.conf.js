@@ -14,6 +14,10 @@ const axios = require('axios');
 const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
 
+const jsonpParse = (str)=>{
+  return JSON.parse(str.replace(/(^\w+\()|(\)$)/g,""))
+}
+
 const devWebpackConfig = merge(baseWebpackConfig, {
   module: {
     rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap, usePostCSS: true })
@@ -82,6 +86,20 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           console.log(e)
         })
       })
+      app.get('/api/getSongList', function (req, res) {
+        var url = 'https://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg'
+        axios.get(url, {
+          headers: {
+            referer: 'https://y.qq.com/n/yqq/playsquare/3664579116.html'
+          },
+          params: req.query
+        }).then((response) => {
+          var ret = response.data
+          res.json(jsonpParse(ret))
+        }).catch((e) => {
+          console.log(e)
+        })
+      });
     }
   },
   plugins: [
@@ -133,3 +151,5 @@ module.exports = new Promise((resolve, reject) => {
     }
   })
 })
+
+

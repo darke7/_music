@@ -105,6 +105,11 @@ export default {
   z-index:2
   .recommend-content
     height: 100%
+    overflow: hidden
+    .slider-wrapper
+      position: relative
+      width: 100%
+      overflow: hidden
     .slider-wrapper
       position: relative
       width: 100%
