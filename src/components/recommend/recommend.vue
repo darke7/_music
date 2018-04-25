@@ -1,6 +1,6 @@
 <template>
-  <div class="recommend">
-      <scroll class="recommend-content" :data="discList">
+  <div class="recommend" ref="recommend">
+      <scroll class="recommend-content" :data="discList" ref="scroll">
         <div>
           <div v-if="recommends.length" class="slider-wrapper" ref="sliderWrapper">
               <slider swipeid="swipe" :loop="true" :autoplay="2500">
@@ -13,7 +13,7 @@
           <div class="recommend-list">
             <h1 class="list-title">热门歌单推荐</h1>
             <ul>
-              <li @click="" v-for="item in discList" class="item">
+              <li @click="selectItem(item)" v-for="item in discList" class="item">
                 <div class="icon">
                   <img width="60" height="60" v-lazy="item.imgurl">
                 </div>
@@ -27,6 +27,7 @@
           </div>
         </div>
       </scroll>
+      <router-view></router-view>
   </div>
 </template>
 <script>
@@ -36,7 +37,11 @@ import slider from 'base/slider/slider'
 import scroll from 'base/scroll/scroll'
 import loading from 'base/loading/loading'
 import axios from 'axios'
+import {playlistMixin} from 'common/js/mixin.js'
+import {mapMutations} from 'vuex'
+
 export default {
+  mixins: [playlistMixin],
   data () {
     return {
     	recommends: [],
@@ -48,11 +53,20 @@ export default {
     setTimeout(()=>{
       this._getDiscList();
     },1000);
-    axios.get('static/ECHO.mp3').then((res)=>{
-      console.log(res);
-    });
   },
   methods:{
+    selectItem(item){
+      this.$router.push({
+        path:`recommend/${item.dissid}`
+      })
+      this.setDisc(item);
+    },
+    handlePlaylist(playlist) {
+      const bottom = playlist.length > 0 ? '60px' : ''
+
+      this.$refs.recommend.style.bottom = bottom
+      this.$refs.scroll.refresh()
+    },
   	_getRecommend(){
   		getRecommend().then((res) => {
   			if (res.code === ERR_OK) {
@@ -66,7 +80,10 @@ export default {
           this.discList = res.data.list;
         }
       })
-    }
+    },
+    ...mapMutations({
+      'setDisc':'SET_DISC'
+      })
   },
   components:{
     slider,
@@ -85,6 +102,7 @@ export default {
   width: 100%
   top: 88px
   bottom: 0
+  z-index:2
   .recommend-content
     height: 100%
     .slider-wrapper
@@ -93,6 +111,7 @@ export default {
       overflow: hidden
       text-align:center
       height:150px
+      z-index:1
       img
         height:150px
       .swiper-pagination-bullet-active

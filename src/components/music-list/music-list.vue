@@ -1,5 +1,5 @@
 <template>
-  <div class="music-list">
+  <div class="music-list" >
     <div class="back" @click="back">
       <i class="icon-back"></i>
     </div>
@@ -26,12 +26,14 @@ import scroll from 'base/scroll/scroll'
 import songList from 'base/song-list/song-list'
 import {prefixStyle} from 'common/js/dom'
 import {mapActions} from 'vuex'
+import {playlistMixin} from 'common/js/mixin.js'
 
 const RESERVED_HEIGHT = 40
 const transform = prefixStyle('transform');
 const backdrop = prefixStyle('backdrop-filter');
 
   export default {
+    mixins: [playlistMixin],
     data() {
       return {
         scrollY: 0
@@ -61,6 +63,12 @@ const backdrop = prefixStyle('backdrop-filter');
       this.$refs.list.$el.style.top = `${this.imageHeight}px`
     },
     methods: {
+      handlePlaylist(playlist) {
+        const bottom = playlist.length > 0 ? '60px' : ''
+
+        this.$refs.list.$el.style.bottom = bottom
+        this.$refs.list.refresh()
+      },
       _randomPlay(){
         this.randomPlay({
           list:this.songs

@@ -5,6 +5,7 @@ const rank = resolve => require(['components/rank/rank'],resolve);
 const singer = resolve => require(['components/singer/singer'],resolve);
 const search = resolve => require(['components/search/search'],resolve);
 const singerDetail = resolve => require(['components/singer-detail/singer-detail'],resolve);
+const disc = resolve => require(['components/disc/disc'],resolve);
 
 Vue.use(Router)
 
@@ -16,7 +17,13 @@ export default new Router({
     },
     {
       path: '/recommend',
-      component:recommend
+      component:recommend,
+      children:[
+        {
+          path:':id',
+          component:disc
+        }
+      ]
     },
     {
       path: '/rank',
