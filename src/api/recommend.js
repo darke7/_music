@@ -52,6 +52,10 @@ export function getSongList(disstid) {
     needNewCode:0
   })
 
-  return jsonp(url, data, options)
+  return axios.get(url, {
+    params: data
+  }).then((res) => {
+    return Promise.resolve(res.data)
+  })
 }
 

@@ -1,7 +1,7 @@
 <template>
   <transition name="slide">
     <div class="disc">
-      <music-list :title="title" :bg-image="bgImg"></music-list>
+      <music-list :title="title" :bg-image="bgImg" :songs="songs"></music-list>
     </div>
   </transition>
 </template>
@@ -10,8 +10,14 @@
   import MusicList from 'components/music-list/music-list'
   import {mapGetters} from 'vuex'
   import {getSongList} from 'api/recommend.js'
+  import {ERR_OK} from 'api/config.js'
 
   export default {
+    data(){
+      return {
+        songs:[]
+      }
+    },
     computed:{
       ...mapGetters([
           'disc'
@@ -29,8 +35,14 @@
     },
     methods:{
       _getSongList(dissid){
+        console.log('get 1')
+        let that = this;
         getSongList(dissid).then((res)=>{
-          // console.log(res);
+          console.log(res);
+          if(res.code === ERR_OK){
+            that.songs = res.cdlist[0].songlist;
+            console.log(that.songs);
+          }
         })
       }
     },
