@@ -11,6 +11,7 @@
   import {mapGetters} from 'vuex'
   import {getSongList} from 'api/recommend.js'
   import {ERR_OK} from 'api/config.js'
+  import {createSong} from 'common/js/song'
 
   export default {
     data(){
@@ -34,16 +35,25 @@
       this._getSongList(this.disc.dissid);
     },
     methods:{
-      _getSongList(dissid){
-        console.log('get 1')
-        let that = this;
-        getSongList(dissid).then((res)=>{
-          console.log(res);
-          if(res.code === ERR_OK){
-            that.songs = res.cdlist[0].songlist;
-            console.log(that.songs);
+      _getSongList() {
+        if (!this.disc.dissid) {
+          this.$router.push('/recommend')
+          return
+        }
+        getSongList(this.disc.dissid).then((res) => {
+          if (res.code === ERR_OK) {
+            this.songs = this._normalizeSongs(res.cdlist[0].songlist)
           }
         })
+      },
+      _normalizeSongs(list) {
+        let ret = []
+        list.forEach((musicData) => {
+          if (musicData.songid && musicData.albummid) {
+            ret.push(createSong(musicData))
+          }
+        })
+        return ret
       }
     },
     components: {

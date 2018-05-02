@@ -15,7 +15,7 @@
     <scroll :data="songs" class="list" @scroll="scroll"
             :listen-scroll="listenScroll" :probe-type="probeType" ref="list">
       <div class="song-list-wrapper">
-        <song-list :songs="songs" @select="select"></song-list>
+        <song-list :songs="songs" :rank="rank" @select="select"></song-list>
       </div>
     </scroll>
   </div>
@@ -51,6 +51,10 @@ const backdrop = prefixStyle('backdrop-filter');
       title: {
         type: String,
         default: ''
+      },
+      rank: {
+        type: Boolean,
+        default: false
       }
     },
     created() {
