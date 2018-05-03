@@ -8,7 +8,7 @@
           <i :class="getIconCls(item)"></i>
         </div>
         <div class="name">
-          <p class="text" v-html="getDisplayName"></p>
+          <p class="text" v-html="getDisplayName(item)"></p>
         </div>
       </li>
       <!-- <loading v-show="hasMore" title=""></loading> -->
@@ -79,7 +79,7 @@
         if(item.type === TYPE_SINGER){
           return item.singername;
         }else{
-          return `${item.songname}--}`
+          return `${item.songname}--${filterSinger(item.singer)}}`
         }
       }
     },

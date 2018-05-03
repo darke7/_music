@@ -45,13 +45,13 @@ export function createSong(musicData) {
   })
 }
 
-export function filterSinger(singer,q) {
+export function filterSinger(singer) {
   let ret = []
   if (!singer) {
-    return ''
+      return ''
   }
   singer.forEach((s) => {
-    ret.push(s[q|name])
+      ret.push(s.name)
   })
   return ret.join('/')
 }

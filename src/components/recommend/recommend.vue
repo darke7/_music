@@ -36,7 +36,6 @@ import {getRecommend,getDiscList} from 'api/recommend'
 import slider from 'base/slider/slider'
 import scroll from 'base/scroll/scroll'
 import loading from 'base/loading/loading'
-import axios from 'axios'
 import {playlistMixin} from 'common/js/mixin.js'
 import {mapMutations} from 'vuex'
 
