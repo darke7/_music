@@ -16,7 +16,6 @@ export function getSongsUrl(songs) {
     })
 
     const urlMid = genUrlMid(mids, types)
-
     const data = Object.assign({}, commonParams, {
         g_tk: 5381,
         format: 'json',
@@ -101,22 +100,47 @@ export function getUid() {
     return _uid
 }
 
+// export function getLyric(mid) {
+//   const url = '/api/lyric'
+
+//   const data = Object.assign({}, commonParams, {
+//     songmid: mid,
+//     platform: 'yqq',
+//     hostUin: 0,
+//     needNewCode: 0,
+//     categoryId: 10000000,
+//     pcachetime: +new Date(),
+//     format: 'json'
+//   })
+
+//   return axios.get(url, {
+//     params: data
+//   }).then((res) => {
+//     return Promise.resolve(res.data)
+//   })
+// }
 export function getLyric(mid) {
-  const url = '/api/lyric'
+    const url = 'http://ustbhuangyi.com/music/api/lyric';
 
-  const data = Object.assign({}, commonParams, {
-    songmid: mid,
-    platform: 'yqq',
-    hostUin: 0,
-    needNewCode: 0,
-    categoryId: 10000000,
-    pcachetime: +new Date(),
-    format: 'json'
-  })
+    const data = Object.assign({}, commonParams, {
+        songmid: mid,
+        platform: 'yqq',
+        hostUin: 0,
+        needNewCode: 0,
+        categoryId: 10000000,
+        pcachetime: +new Date(),
+        format: 'json'
+    })
 
-  return axios.get(url, {
-    params: data
-  }).then((res) => {
-    return Promise.resolve(res.data)
-  })
+    return axios({
+        method: 'post',
+        url: proxyRequest,
+        data: {
+            method: 'get',
+            baseURL: url,
+            data: data
+        }
+    }).then((res) => {
+        return Promise.resolve(res.data)
+    })
 }
