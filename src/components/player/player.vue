@@ -96,9 +96,10 @@
             <i @click.stop="tagglePlaying" class="icon-mini" :class="miniIcon"></i>
           </progress-circle>
         </div>
-        <div class="control">
+        <div class="control" @click.stop="showPlaylist">
           <i class="icon-playlist"></i>
         </div>
+        <playlist ref="playlist"></playlist>
         <audio ref='audio' :src="currentSong.url" @canplay="read" @error="error" @timeupdate="timeUpdate" @ended="end"></audio>
       </div>
     </transition>
@@ -116,6 +117,7 @@ import {shuffle} from 'common/js/util.js'
 import Lyric from 'lyric-parser'
 // import slider from 'base/slider/slider'
 import scroll from 'base/scroll/scroll'
+import playlist from 'components/playlist/playlist'
 
 const transform = prefixStyle('transform')
 const transitionDuration = prefixStyle('transitionDuration')
@@ -217,6 +219,9 @@ export default {
     }
   },
   methods:{
+    showPlaylist(){
+      this.$refs.playlist.show();
+    },
     middleTouchStart(e) {
       this.touch.initiated = true
       // 用来判断是否是一次移动
@@ -458,7 +463,8 @@ export default {
     progressBar,
     progressCircle,
     // slider,
-    scroll
+    scroll,
+    playlist
   }
 }
 </script>
