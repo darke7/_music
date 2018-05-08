@@ -4,8 +4,8 @@
       <div class="list-wrapper" >
         <div class="list-header">
           <h1 class="title">
-            <i class="icon" ></i>
-            <span class="text"></span>
+            <i class="icon" :class="modeIcon" @click.stop="changeMode"></i>
+            <span class="text">{{modeText}}</span>
             <span class="clear" @click.stop="showConfirmClear"><i class="icon-clear"></i></span>
           </h1>
         </div>
@@ -13,11 +13,11 @@
           <transition-group ref="list" name="list" tag="ul">
             <li :key="item.id" ref="listItem" class="item" v-for="(item,k) in sequenceList" @click.stop="selectItem(item,k)">
               <i class="current" :class="getCurrentIcon(item)"></i>
-              <span class="text">{{item.name}}</span>
+              <span class="text">{{item.name}} -- {{item.singer}}</span>
               <span class="like">
                 <i class="icon-not-favorite"></i>
               </span>
-              <span class="delete" @click.stop="deleteOne(item)">
+              <span class="delete" @click.stop="showConfirmDel(item)">
                 <i class="icon-delete"></i>
               </span>
             </li>
@@ -33,31 +33,31 @@
           <span>关闭</span>
         </div>
       </div>
-      <confirm ref="confirm" @confirm="confirmClear" confirmBtnText="清空">是否清空播放列表</confirm>
+      <confirm ref="confirmClear" @confirm="confirmClear" confirmBtnText="清空">是否清空播放列表？</confirm>
+      <confirm ref="confirmDel" @confirm="confirmDel">删除  {{delSong.name}}--{{delSong.singer}}？</confirm>
       <div ref="addSong"></div>
     </div>
   </transition>
 </template>
 
 <script type="text/ecmascript-6">
-import {mapGetters,mapMutations,mapActions} from 'vuex'
+import {mapActions} from 'vuex'
 import scroll from 'base/scroll/scroll'
 import {playMode} from 'common/js/config'
 import confirm from 'base/confirm/confirm'
+import {playerMixin} from 'common/js/mixin.js'
   export default {
+    mixins:[playerMixin],
     data(){
       return {
-        showFlag:false
+        showFlag:false,
+        delSong:{}
       }
     },
     computed:{
-      ...mapGetters([
-          'sequenceList',
-          'currentSong',
-          'playlist',
-          'mode',
-          'currentIndex'
-        ])
+      modeText() {
+        return this.mode === playMode.sequence ? '顺序播放' : this.mode === playMode.random ? '随机播放' : '单曲循环'
+      }
     },
     methods:{
       hide(){
@@ -98,12 +98,23 @@ import confirm from 'base/confirm/confirm'
         this.deleteSongList();
       },
       showConfirmClear(){
-        this.$refs.confirm.show()
+        this.$refs.confirmClear.show()
       },
-      ...mapMutations({
-        setCurrentIndex:'SET_CURRENT_INDEX',
-        setPlayingState:'SET_PLAYING_STATE'
-      }),
+      confirmDel(){
+        if(!this.delSong){
+          return
+        }
+        this.deleteSong(this.delSong);
+        if(!this.playlist.length){
+          this.hide();
+        }
+        this.delSong = {};
+      },
+      showConfirmDel(item){
+        console.log(item)
+        this.delSong = item;
+        this.$refs.confirmDel.show()
+      },
       ...mapActions([
           'deleteSong',
           'deleteSongList'
