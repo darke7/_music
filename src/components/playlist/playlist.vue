@@ -1,27 +1,27 @@
 <template>
   <transition name="list-fade"  >
-    <div class="playlist" v-show="showFlag"  @click="hide">
-      <div class="list-wrapper" @click.stop>
+    <div class="playlist" v-show="showFlag"  @click.stop="hide" >
+      <div class="list-wrapper" >
         <div class="list-header">
           <h1 class="title">
             <i class="icon" ></i>
             <span class="text"></span>
-            <span class="clear" ><i class="icon-clear"></i></span>
+            <span class="clear" @click.stop="showConfirmClear"><i class="icon-clear"></i></span>
           </h1>
         </div>
-        <scroll ref="listContent"  class="list-content" >
-          <ul ref="list" name="list" tag="ul">
-            <li  class="item" v-for="(item,k) in sequenceList" @click="selectItem(item,k)">
+        <scroll ref="listContent" :data="sequenceList" class="list-content" >
+          <transition-group ref="list" name="list" tag="ul">
+            <li :key="item.id" ref="listItem" class="item" v-for="(item,k) in sequenceList" @click.stop="selectItem(item,k)">
               <i class="current" :class="getCurrentIcon(item)"></i>
               <span class="text">{{item.name}}</span>
               <span class="like">
                 <i class="icon-not-favorite"></i>
               </span>
-              <span class="delete">
+              <span class="delete" @click.stop="deleteOne(item)">
                 <i class="icon-delete"></i>
               </span>
             </li>
-          </ul>
+          </transition-group>
         </scroll>
         <div class="list-operate">
           <div class="add">
@@ -33,16 +33,17 @@
           <span>关闭</span>
         </div>
       </div>
-      <div ref="confirm"  text="是否清空播放列表" confirmBtnText="清空"></div>
+      <confirm ref="confirm" @confirm="confirmClear" confirmBtnText="清空">是否清空播放列表</confirm>
       <div ref="addSong"></div>
     </div>
   </transition>
 </template>
 
 <script type="text/ecmascript-6">
-import {mapGetters,mapMutations} from 'vuex'
+import {mapGetters,mapMutations,mapActions} from 'vuex'
 import scroll from 'base/scroll/scroll'
 import {playMode} from 'common/js/config'
+import confirm from 'base/confirm/confirm'
   export default {
     data(){
       return {
@@ -53,7 +54,9 @@ import {playMode} from 'common/js/config'
       ...mapGetters([
           'sequenceList',
           'currentSong',
-          'playList'
+          'playlist',
+          'mode',
+          'currentIndex'
         ])
     },
     methods:{
@@ -64,6 +67,7 @@ import {playMode} from 'common/js/config'
         this.showFlag=true;
         setTimeout(()=>{
           this.$refs.listContent.refresh();
+          this.scrollToCurrent();
         },20)
       },
       getCurrentIcon(item){
@@ -74,20 +78,48 @@ import {playMode} from 'common/js/config'
       },
       selectItem(item,k){
         if(this.mode === playMode.random){
-          k = this.playList.findIndex((song)=>{
+          k = this.playlist.findIndex((song)=>{
             return song.id === item.id;
           });
         }
         this.setCurrentIndex(k);
         this.setPlayingState(true);
       },
+      scrollToCurrent(current){
+        this.$refs.listContent.scrollToElement(this.$refs.listItem[this.currentIndex],300);
+      },
+      deleteOne(item){
+        this.deleteSong(item);
+        if(!this.playlist.length){
+          this.hide();
+        }
+      },
+      confirmClear(){
+        this.deleteSongList();
+      },
+      showConfirmClear(){
+        this.$refs.confirm.show()
+      },
       ...mapMutations({
         setCurrentIndex:'SET_CURRENT_INDEX',
         setPlayingState:'SET_PLAYING_STATE'
-      })
+      }),
+      ...mapActions([
+          'deleteSong',
+          'deleteSongList'
+        ])
+    },
+    watch:{
+      currentSong(oldv,newv){
+        if(!this.showFlag||oldv===newv){
+          return
+        }
+        this.scrollToCurrent();
+      }
     },
     components:{
-      scroll
+      scroll,
+      confirm
     }
   }
 </script>
