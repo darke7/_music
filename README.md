@@ -1,4 +1,4 @@
-# vi
+# _music
 
 > A Vue.js project
 
