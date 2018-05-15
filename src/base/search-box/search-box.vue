@@ -35,7 +35,7 @@
     created() {
       this.$watch('query', debounce((newQuery) => {
         this.$emit('query', newQuery)
-      }, 200))
+      }, 300))
     }
   }
 </script>

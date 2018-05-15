@@ -19,7 +19,7 @@
       </scroll>
     </div>
     <div class="search-result" v-show="query" ref="searchResult">
-      <suggest  ref="suggest" :query="query"></suggest>
+      <suggest @listScroll="blurInput"  ref="suggest" :query="query"></suggest>
     </div>
     <router-view></router-view>
   </div>
@@ -27,10 +27,10 @@
 
 <script type="text/ecmascript-6">
   import searchBox from 'base/search-box/search-box'
-  // import SearchList from 'base/search-list/search-list'
-  import Scroll from 'base/scroll/scroll'
+  // import searchList from 'base/search-list/search-list'
+  import scroll from 'base/scroll/scroll'
   // import Confirm from 'base/confirm/confirm'
-  import Suggest from 'components/suggest/suggest'
+  import suggest from 'components/suggest/suggest'
   import {getHotKey} from 'api/search'
   import {ERR_OK} from 'api/config'
   // import {playlistMixin, searchMixin} from 'common/js/mixin'
@@ -78,6 +78,9 @@
           }
         })
       },
+      blurInput(){
+        this.$refs.searchBox.blur();
+      },
       // ...mapActions([
       //   'clearSearchHistory'
       // ])
@@ -93,10 +96,10 @@
     },
     components: {
       searchBox,
-      // SearchList,
-      Scroll,
+      // searchList,
+      scroll,
       // Confirm,
-      Suggest
+      suggest
     }
   }
 </script>
