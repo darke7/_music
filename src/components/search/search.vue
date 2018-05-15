@@ -14,12 +14,21 @@
               </li>
             </ul>
           </div>
-
+          <div class="search-history" v-show="searchHistory.length">
+            <h1 class="title">
+              <span class="text">搜索历史</span>
+              <span @click="showConfirm" class="clear">
+                <i class="icon-clear"></i>
+              </span>
+            </h1>
+            <p v-for='i in searchHistory'>{{i}}</p>
+            <!-- <search-list @delete="deleteSearchHistory" @select="addQuery" :searches="searchHistory"></search-list> -->
+          </div>
         </div>
       </scroll>
     </div>
     <div class="search-result" v-show="query" ref="searchResult">
-      <suggest @listScroll="blurInput"  ref="suggest" :query="query"></suggest>
+      <suggest @listScroll="blurInput" @select="saveSearch"  ref="suggest" :query="query"></suggest>
     </div>
     <router-view></router-view>
   </div>
@@ -34,7 +43,7 @@
   import {getHotKey} from 'api/search'
   import {ERR_OK} from 'api/config'
   // import {playlistMixin, searchMixin} from 'common/js/mixin'
-  // import {mapActions} from 'vuex'
+  import {mapActions,mapGetters} from 'vuex'
 
   export default {
     // mixins: [playlistMixin, searchMixin],
@@ -46,8 +55,12 @@
     },
     computed: {
       shortcut() {
+        console.log(this.searchHistory)
         return this.hotKey.concat(this.searchHistory)
-      }
+      },
+      ...mapGetters([
+        'searchHistory'
+      ])
     },
     created() {
       this._getHotKey()
@@ -81,9 +94,14 @@
       blurInput(){
         this.$refs.searchBox.blur();
       },
-      // ...mapActions([
-      //   'clearSearchHistory'
-      // ])
+      saveSearch() {
+        this.saveSearchHistory(this.query)
+      },
+      ...mapActions([
+        'clearSearchHistory',
+        'saveSearchHistory',
+        'deleteSearchHistory'
+      ])
     },
     watch: {
       query(newQuery) {
