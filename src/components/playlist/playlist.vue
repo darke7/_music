@@ -34,7 +34,7 @@
         </div>
       </div>
       <confirm ref="confirmClear" @confirm="confirmClear" confirmBtnText="清空">是否清空播放列表？</confirm>
-      <confirm ref="confirmDel" @confirm="confirmDel">删除  {{delSong.name}}--{{delSong.singer}}？</confirm>
+      <confirm ref="confirmDel" @confirm="confirmDel">删除 <br/> {{delSong.name}}--{{delSong.singer}}？</confirm>
       <add-song ref="addSong"></add-song>
     </div>
   </transition>

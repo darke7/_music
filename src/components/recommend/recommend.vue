@@ -6,7 +6,7 @@
               <slider swipeid="swipe" :loop="true" :autoplay="2500">
                 <div v-for="top in recommends" :key="top.id" class="swiper-slide" slot="swiper-con" >
                   <img :src="top.picUrl">
-                <!-- <h3>{{top.title}}</h3> -->
+                <h3>{{top.title}}</h3>
                 </div>
               </slider>
           </div>

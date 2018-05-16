@@ -4,7 +4,7 @@
       <search-box ref="searchBox" @query="onQueryChange"></search-box>
     </div>
     <div ref="shortcutWrapper" class="shortcut-wrapper" v-show="!query">
-      <scroll ref="shortcut" class="shortcut">
+      <scroll ref="shortcut" class="shortcut" :data="shortcut">
         <div>
           <div class="hot-key">
             <h1 class="title">热门搜索</h1>
@@ -21,8 +21,7 @@
                 <i class="icon-clear"></i>
               </span>
             </h1>
-            <p v-for='i in searchHistory'>{{i}}</p>
-            <!-- <search-list @delete="deleteSearchHistory" @select="addQuery" :searches="searchHistory"></search-list> -->
+            <search-list @delete="deleteSearchHistory" @select="addQuery" :searches="searchHistory"></search-list>
           </div>
         </div>
       </scroll>
@@ -30,23 +29,24 @@
     <div class="search-result" v-show="query" ref="searchResult">
       <suggest @listScroll="blurInput" @select="saveSearch"  ref="suggest" :query="query"></suggest>
     </div>
+    <confirm ref="confirm" @confirm="clearSearchHistory" confirmBtnText="清空">是否清空所有搜索历史?</confirm>
     <router-view></router-view>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   import searchBox from 'base/search-box/search-box'
-  // import searchList from 'base/search-list/search-list'
+  import searchList from 'base/search-list/search-list'
   import scroll from 'base/scroll/scroll'
-  // import Confirm from 'base/confirm/confirm'
+  import confirm from 'base/confirm/confirm'
   import suggest from 'components/suggest/suggest'
   import {getHotKey} from 'api/search'
   import {ERR_OK} from 'api/config'
-  // import {playlistMixin, searchMixin} from 'common/js/mixin'
+  import {playlistMixin} from 'common/js/mixin'
   import {mapActions,mapGetters} from 'vuex'
 
   export default {
-    // mixins: [playlistMixin, searchMixin],
+    mixins: [playlistMixin],
     data() {
       return {
         hotKey: [],
@@ -66,6 +66,15 @@
       this._getHotKey()
     },
     methods: {
+      handlePlaylist(playlist) {
+        const bottom = playlist.length > 0 ? '60px' : ''
+
+        this.$refs.searchResult.style.bottom = bottom
+        this.$refs.suggest.refresh()
+
+        this.$refs.shortcutWrapper.style.bottom = bottom
+        this.$refs.shortcut.refresh()
+      },
       addQuery(str){
         this.$refs.searchBox.setQuery(str);
       },
@@ -114,9 +123,9 @@
     },
     components: {
       searchBox,
-      // searchList,
+      searchList,
       scroll,
-      // Confirm,
+      confirm,
       suggest
     }
   }
