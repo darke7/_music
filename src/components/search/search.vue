@@ -1,5 +1,5 @@
 <template>
-  <div class="search">
+  <div class="search" @query="console">
     <div class="search-box-wrapper">
       <search-box ref="searchBox" @query="onQueryChange"></search-box>
     </div>
@@ -42,30 +42,29 @@
   import suggest from 'components/suggest/suggest'
   import {getHotKey} from 'api/search'
   import {ERR_OK} from 'api/config'
-  import {playlistMixin} from 'common/js/mixin'
+  import {playlistMixin,searchMixin} from 'common/js/mixin'
   import {mapActions,mapGetters} from 'vuex'
 
   export default {
-    mixins: [playlistMixin],
+    mixins: [playlistMixin,searchMixin],
     data() {
       return {
         hotKey: [],
-        query:''
       }
     },
     computed: {
       shortcut() {
-        console.log(this.searchHistory)
+        // console.log(this.searchHistory)
         return this.hotKey.concat(this.searchHistory)
-      },
-      ...mapGetters([
-        'searchHistory'
-      ])
+      }
     },
     created() {
       this._getHotKey()
     },
     methods: {
+      console(){
+        console.log(123132135)
+      },
       handlePlaylist(playlist) {
         const bottom = playlist.length > 0 ? '60px' : ''
 
@@ -74,21 +73,6 @@
 
         this.$refs.shortcutWrapper.style.bottom = bottom
         this.$refs.shortcut.refresh()
-      },
-      addQuery(str){
-        this.$refs.searchBox.setQuery(str);
-      },
-      // handlePlaylist(playlist) {
-      //   const bottom = playlist.length > 0 ? '60px' : ''
-
-      //   this.$refs.searchResult.style.bottom = bottom
-      //   this.$refs.suggest.refresh()
-
-      //   this.$refs.shortcutWrapper.style.bottom = bottom
-      //   this.$refs.shortcut.refresh()
-      // },
-      onQueryChange(query){
-        this.query = query;
       },
       showConfirm() {
         this.$refs.confirm.show()
@@ -100,16 +84,8 @@
           }
         })
       },
-      blurInput(){
-        this.$refs.searchBox.blur();
-      },
-      saveSearch() {
-        this.saveSearchHistory(this.query)
-      },
       ...mapActions([
-        'clearSearchHistory',
-        'saveSearchHistory',
-        'deleteSearchHistory'
+        'clearSearchHistory'
       ])
     },
     watch: {

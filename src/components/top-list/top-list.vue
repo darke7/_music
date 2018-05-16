@@ -45,7 +45,6 @@
           if (res.code === ERR_OK) {
             processSongsUrl(this._normalizeSongs(res.songlist)).then(songs=>{
               this.songs = songs
-              console.log(this.song)
             })
           }
         })

@@ -8,11 +8,11 @@
         </div>
       </div>
       <div class="search-box-wrapper">
-        <!-- <search-box ref="searchBox" @query="onQueryChange" placeholder="搜索歌曲"></search-box> -->
+        <search-box ref="searchBox" @query="search" placeholder="搜索歌曲"></search-box>
       </div>
-     <!--  <div class="shortcut" >
+      <div class="shortcut" >
         <switches :switches="switches" :currentIndex="currentIndex" @switch="switchItem"></switches>
-        <div class="list-wrapper">
+        <!-- <div class="list-wrapper">
           <scroll ref="songList" v-if="currentIndex===0" class="list-scroll" :data="playHistory">
             <div class="list-inner">
               <song-list :songs="playHistory" @select="selectSong">
@@ -25,12 +25,12 @@
               <search-list @delete="deleteSearchHistory" @select="addQuery" :searches="searchHistory"></search-list>
             </div>
           </scroll>
-        </div>
+        </div> -->
       </div>
       <div class="search-result" v-show="query">
         <suggest :query="query" :showSinger="showSinger" @select="selectSuggest" @listScroll="blurInput"></suggest>
       </div>
-      <top-tip ref="topTip">
+      <!-- <top-tip ref="topTip">
         <div class="tip-title">
           <i class="icon-ok"></i>
           <span class="text">1首歌曲已经添加到播放列表</span>
@@ -41,19 +41,46 @@
 </template>
 
 <script type="text/ecmascript-6">
+import searchBox from 'base/search-box/search-box'
+import suggest from 'components/suggest/suggest'
+import switches from 'base/switches/switches'
+import {playlistMixin,searchMixin} from 'common/js/mixin'
   export default {
+    mixins:[searchMixin],
     data(){
       return {
-        showFlag:false
+        showFlag:false,
+        query:'',
+        showSinger:false,
+        currentIndex:0,
+        switches:[
+          {name:'最近播放'},
+          {name:'播放历史'}
+        ]
       }
     },
     methods:{
+      switchItem(index){
+        this.currentIndex = index;
+      },
       hide(){
         this.showFlag = false;
       },
       show(){
         this.showFlag = true;
-      }
+      },
+      search(query){
+        this.query = query;
+      },
+      blurInput(){
+        this.$refs.searchBox.blur();
+      },
+      selectSuggest(){}
+    },
+    components:{
+      searchBox,
+      suggest,
+      switches
     }
   }
 </script>
