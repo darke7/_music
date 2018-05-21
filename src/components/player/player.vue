@@ -107,7 +107,7 @@
 </template>
 
 <script type="text/ecmascript-6">
-import {mapGetters,mapMutations} from 'vuex'
+import {mapGetters,mapMutations,mapActions} from 'vuex'
 import animations from 'create-keyframe-animation'
 import {prefixStyle} from 'common/js/dom'
 import progressBar from 'base/progress-bar/progress-bar.vue'
@@ -210,6 +210,9 @@ export default {
     }
   },
   methods:{
+    ...mapActions([
+      'savePlayHistory'
+    ]),
     ...mapMutations({
       setPlayer:'SET_FULL_SCREEN'
     }),
@@ -311,6 +314,7 @@ export default {
     },
     read(){
       this.songRead = true;
+      this.savePlayHistory(this.currentSong);
     },
     next(){
       if(this.songRead){
