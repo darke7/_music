@@ -6,7 +6,8 @@ const singer = resolve => require(['components/singer/singer'],resolve);
 const search = resolve => require(['components/search/search'],resolve);
 const singerDetail = resolve => require(['components/singer-detail/singer-detail'],resolve);
 const disc = resolve => require(['components/disc/disc'],resolve);
-const toplist       = resolve => require(['@/components/top-list/top-list.vue'], resolve);
+const toplist       = resolve => require(['components/top-list/top-list.vue'], resolve);
+const userCenter = resolve => require(['components/user-center/user-center'],resolve)
 
 Vue.use(Router)
 
@@ -55,6 +56,10 @@ export default new Router({
           component:singerDetail
         }
       ]
+    },
+    {
+      path:'/user',
+      component:userCenter
     }
   ]
 })

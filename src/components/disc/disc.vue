@@ -5,7 +5,7 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import MusicList from 'components/music-list/music-list'
+  import musicList from 'components/music-list/music-list'
   import {mapGetters} from 'vuex'
   import {getSongList} from 'api/recommend.js'
   import {ERR_OK} from 'api/config.js'
@@ -58,7 +58,7 @@ import { createSong, isValidMusic, processSongsUrl } from "common/js/song.js";
       }
     },
     components: {
-      MusicList
+      musicList
     }
   }
 </script>
