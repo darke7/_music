@@ -52,6 +52,7 @@ export default {
     setTimeout(()=>{
       this._getDiscList();
     },1000);
+    console.log(1231)
   },
   methods:{
     selectItem(item){

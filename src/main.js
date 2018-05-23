@@ -7,6 +7,14 @@ import router from './router'
 import store from './store'
 import fastclick from 'fastclick'
 import lazyload from 'vue-lazyload'
+
+// 因为vConsole并不需要调用，
+// 所以前面加“eslint-disable no-unused-vars”规避掉eslint语法检查
+
+/* eslint-disable no-unused-vars */
+import vConsole from 'vconsole'
+new vConsole()
+
 import 'common/stylus/index.styl'
 
 
